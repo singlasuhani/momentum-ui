@@ -69,6 +69,7 @@ export namespace DatePicker {
     @property({ type: Boolean }) newMomentum?: boolean = undefined;
     @property({ type: Boolean, attribute: "compact-input" }) compactInput?: boolean = undefined;
     @property({ type: Object, attribute: false }) controlButtons?: DatePickerControlButtons = undefined;
+    @property({ type: String, reflect: true }) variant: 'regular' | 'small' = 'regular';
 
     @internalProperty() selectedDate: DateTime = now();
     @internalProperty() focusedDate: DateTime = now();
@@ -346,42 +347,60 @@ export namespace DatePicker {
       `;
     }
 
+    private renderTrigger(): TemplateResult {
+      if (this.customTrigger) {
+        return html`
+          <span slot="menu-trigger">
+            <slot name="date-trigger"></slot>
+          </span>
+        `;
+      }
+
+      if (this.variant === 'small') {
+        return html`
+          <md-button
+            slot="menu-trigger"
+            circle
+            size="36"
+            variant="secondary"
+          >
+            <md-icon name="calendar-month-bold" size="16" iconSet="momentumDesign"></md-icon>
+          </md-button>
+        `;
+      }
+
+      return html`
+        <md-input
+          class="date-input"
+          slot="menu-trigger"
+          role="combobox"
+          ?newMomentum=${this.computedNewMomentum}
+          placeholder=${this.placeholder ? this.placeholder : "YYYY-MM-DD"}
+          value=${ifDefined(this.value ?? undefined)}
+          htmlId=${this.htmlId}
+          label=${this.label}
+          ariaLabel=${this.ariaLabel + this.chosenDateLabel()}
+          ariaExpanded=${this.isMenuOverlayOpen ? "true" : "false"}
+          ariaControls="date-overlay-content"
+          auxiliaryContentPosition="before"
+          ?required=${this.required}
+          @keydown=${(event: KeyboardEvent) => this.handleInputKeyDown(event)}
+          @input-change="${(e: CustomEvent) => this.handleDateInputChange(e)}"
+          ?disabled=${this.disabled}
+          ?hide-message=${!this.errorMessage || this.isValueValid()}
+          ariaInvalid=${!!this.errorMessage || !this.isValueValid()}
+          .messageArr=${this.messageArray}
+          ?compact=${this.compactInput}
+        >
+          <md-icon slot="input-section" name="calendar-month-bold" size="16" iconSet="momentumDesign"></md-icon>
+        </md-input>
+      `;
+    }
+
     render() {
       return html`
         <md-menu-overlay is-date-picker custom-width="272px" ?disabled=${this.disabled}>
-          ${this.customTrigger
-            ? html`
-                <span slot="menu-trigger">
-                  <slot name="date-trigger"></slot>
-                </span>
-              `
-            : html`
-                <md-input
-                  class="date-input"
-                  slot="menu-trigger"
-                  role="combobox"
-                  ?newMomentum=${this.computedNewMomentum}
-                  placeholder=${this.placeholder ? this.placeholder : "YYYY-MM-DD"}
-                  value=${ifDefined(this.value ?? undefined)}
-                  htmlId=${this.htmlId}
-                  label=${this.label}
-                  ariaLabel=${this.ariaLabel + this.chosenDateLabel()}
-                  ariaExpanded=${this.isMenuOverlayOpen ? "true" : "false"}
-                  ariaControls="date-overlay-content"
-                  auxiliaryContentPosition="before"
-                  ?required=${this.required}
-                  @keydown=${(event: KeyboardEvent) => this.handleInputKeyDown(event)}
-                  @input-change="${(e: CustomEvent) => this.handleDateInputChange(e)}"
-                  ?disabled=${this.disabled}
-                  ?hide-message=${!this.errorMessage || this.isValueValid()}
-                  ariaInvalid=${!!this.errorMessage || !this.isValueValid()}
-                  .messageArr=${this.messageArray}
-                  ?compact=${this.compactInput}
-                >
-                  <md-icon slot="input-section" name="calendar-month-bold" size="16" iconSet="momentumDesign"></md-icon>
-                </md-input>
-              `}
-
+          ${this.renderTrigger()}
           <div class="date-overlay-content">
             <md-datepicker-calendar
               @day-select=${(e: CustomEvent) => this.handleSelect(e)}

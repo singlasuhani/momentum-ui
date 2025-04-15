@@ -39,4 +39,11 @@ export const dateRangePickerTemplate = html`
     .shouldCloseOnSelect=${true}
     newMomentum
   ></md-date-range-picker>
+  <h3>small date range picker with icon only</h3>
+  <md-date-range-picker
+    variant="small"
+    .controlButtons=${{ apply: { value: "Apply" }, cancel: { value: "Cancel" } }}
+    .shouldCloseOnSelect=${true}
+    newMomentum
+  ></md-date-range-picker>
 `;

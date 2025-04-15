@@ -17,7 +17,11 @@ const meta: Meta = {
     maxDate: { control: "text", defaultValue: now().plus({ day: 30 }).toISODate() },
     value: { control: "text", defaultValue: `${now().minus({ day: 2 }).toISODate()} - ${now().toISODate()}` },
     startDate: { control: "text", defaultValue: now().minus({ day: 2 }).toISODate() },
-    endDate: { control: "text", defaultValue: now().toISODate() }
+    endDate: { control: "text", defaultValue: now().toISODate() },
+    variant: { 
+      control: { type: "select" }, 
+      options: ["regular", "small"],
+    }
   },
   parameters: { a11y: { element: "md-date-range-picker" } }
 };
@@ -39,6 +43,7 @@ const render = (args: Args) => {
       start-date=${args.startDate}
       .controlButtons=${controlButtons}
       end-date=${args.endDate}
+      variant=${args.variant}
     >
     </md-date-range-picker>
   `;
